@@ -64,7 +64,30 @@
       opacity: 0.85;
       margin-top: 4px;
       font-weight: 400;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      user-select: none;
     }
+    .header .date:hover { opacity: 1; }
+    .header .date-picker-icon {
+      font-size: 16px;
+      transition: transform 0.2s;
+    }
+    .header .date:active .date-picker-icon { transform: scale(1.2); }
+    .header .back-today {
+      display: none;
+      font-size: 12px;
+      background: rgba(255,255,255,0.25);
+      padding: 3px 10px;
+      border-radius: 12px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+    .header .back-today.show { display: inline-block; }
+    .header .back-today:active { background: rgba(255,255,255,0.45); }
 
     /* ── Stats Bar ── */
     .stats {
@@ -149,6 +172,97 @@
     .btn-add:active {
       transform: scale(0.96);
       background: #4338ca;
+    }
+
+    /* ── Form Row 2: note + duration ── */
+    .form-row-2 {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .form-row-2 input[type="text"].note-input {
+      flex: 2;
+      min-width: 120px;
+      padding: 10px 12px;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      outline: none;
+      background: var(--bg);
+      transition: border-color 0.2s;
+    }
+    .form-row-2 input[type="text"].note-input:focus {
+      border-color: var(--primary);
+    }
+    .duration-group {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .duration-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+    .duration-pill {
+      padding: 6px 10px;
+      border: 2px solid var(--border);
+      border-radius: 18px;
+      font-size: 12px;
+      background: var(--bg);
+      color: var(--text-secondary);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s;
+      user-select: none;
+    }
+    .duration-pill:active { transform: scale(0.95); }
+    .duration-pill.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+    .custom-duration {
+      width: 56px;
+      padding: 6px 6px;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      text-align: center;
+      outline: none;
+      background: var(--bg);
+      display: none;
+    }
+    .custom-duration.show { display: inline-block; }
+    .custom-duration:focus { border-color: var(--primary); }
+
+    /* ── Task card extras ── */
+    .task-extras {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 4px;
+      flex-wrap: wrap;
+    }
+    .task-duration-badge {
+      font-size: 11px;
+      background: #eef2ff;
+      color: var(--primary);
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .task-note-text {
+      font-size: 12px;
+      color: var(--text-secondary);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 200px;
     }
 
     /* ── Task List ── */
@@ -257,6 +371,85 @@
     }
     .btn-delete:active { background: #fee2e2; color: var(--danger); }
 
+    /* ── Journal Section ── */
+    .journal-section {
+      margin: 0 20px 24px;
+    }
+    .journal-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+    }
+    .journal-card .journal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .journal-card .journal-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .journal-card .journal-saved {
+      font-size: 11px;
+      color: var(--success);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .journal-card .journal-saved.visible { opacity: 1; }
+    .btn-save-journal {
+      padding: 8px 18px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 18px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      white-space: nowrap;
+    }
+    .btn-save-journal:active {
+      transform: scale(0.96);
+      background: #4338ca;
+    }
+    .btn-save-journal.saved {
+      background: var(--success);
+    }
+    .journal-card textarea {
+      width: 100%;
+      min-height: 200px;
+      padding: 12px 14px;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans SC', sans-serif;
+      line-height: 1.7;
+      outline: none;
+      resize: vertical;
+      background: var(--bg);
+      transition: border-color 0.2s;
+      color: var(--text);
+    }
+    .journal-card textarea:focus {
+      border-color: var(--primary);
+    }
+    .journal-card textarea::placeholder {
+      color: #94a3b8;
+    }
+    .journal-hint {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+
     /* ── Empty State ── */
     .empty {
       text-align: center;
@@ -349,7 +542,12 @@
   <!-- Header -->
   <div class="header">
     <h1>📋 每日计划</h1>
-    <div class="date" id="dateDisplay"></div>
+    <div class="date" id="dateDisplay">
+      <span id="dateText"></span>
+      <span class="date-picker-icon">📅</span>
+      <span class="back-today" id="backToday">← 回到今天</span>
+    </div>
+    <input type="date" id="datePicker" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;" aria-hidden="true">
   </div>
 
   <!-- Stats -->
@@ -375,6 +573,18 @@
       <input type="time" id="timeInput">
       <button class="btn-add" id="btnAdd">＋ 添加</button>
     </div>
+    <div class="form-row-2">
+      <input type="text" class="note-input" id="noteInput" placeholder="📝 备注（可选）" maxlength="100" autocomplete="off">
+      <span class="duration-label">⏱️ 时长</span>
+      <div class="duration-group" id="durationGroup">
+        <span class="duration-pill" data-dur="15">15分</span>
+        <span class="duration-pill" data-dur="30">30分</span>
+        <span class="duration-pill" data-dur="60">1小时</span>
+        <span class="duration-pill" data-dur="120">2小时</span>
+        <span class="duration-pill" data-dur="custom">自定义</span>
+        <input type="number" class="custom-duration" id="customDuration" placeholder="分钟" min="1" max="480">
+      </div>
+    </div>
   </div>
 
   <!-- Pending Tasks -->
@@ -391,6 +601,19 @@
   <div class="section">
     <div class="section-title">✅ 已完成</div>
     <div class="task-list" id="doneList"></div>
+  </div>
+
+  <!-- Journal / 随笔 -->
+  <div class="journal-section">
+    <div class="journal-card">
+      <div class="journal-header">
+        <span class="journal-title" id="journalTitle">📓 今日随笔</span>
+        <span class="journal-saved" id="journalSaved">✓ 已保存</span>
+        <button class="btn-save-journal" id="btnSaveJournal">💾 保存</button>
+      </div>
+      <textarea id="journalTextarea" placeholder="在这里随便写点什么...&#10;想法、心得、备忘，都可以～"></textarea>
+      <div class="journal-hint">💡 按天独立存储，写完记得点「保存」按钮。</div>
+    </div>
   </div>
 
   <!-- Reminder Overlay (hidden by default) -->
@@ -410,9 +633,12 @@
   <script>
     // ── State ──
     const STORAGE_KEY = 'daily_planner_tasks';
+    const JOURNAL_KEY = 'daily_planner_journal';
     let tasks = [];
     let reminderTimers = {};
     let snoozedTasks = {}; // track snoozed task IDs with their snooze time
+    let journalSaveTimer = null;
+    let viewDate = today(); // the date currently being viewed
 
     // ── DOM ──
     const $date = document.getElementById('dateDisplay');
@@ -430,6 +656,59 @@
     const $reminderTime = document.getElementById('reminderTaskTime');
     const $btnDismiss = document.getElementById('btnDismiss');
     const $btnSnooze = document.getElementById('btnSnooze');
+    const $noteInput = document.getElementById('noteInput');
+    const $durationGroup = document.getElementById('durationGroup');
+    const $customDuration = document.getElementById('customDuration');
+    const $journalTextarea = document.getElementById('journalTextarea');
+    const $journalSaved = document.getElementById('journalSaved');
+    const $btnSaveJournal = document.getElementById('btnSaveJournal');
+    const $journalTitle = document.getElementById('journalTitle');
+    const $dateText = document.getElementById('dateText');
+    const $datePicker = document.getElementById('datePicker');
+    const $backToday = document.getElementById('backToday');
+    const $addForm = document.querySelector('.add-form');
+
+    // ── Duration Selection ──
+    let selectedDuration = 0; // 0 = not set
+
+    function resetDurationPills() {
+      selectedDuration = 0;
+      $durationGroup.querySelectorAll('.duration-pill').forEach(p => p.classList.remove('active'));
+      $customDuration.classList.remove('show');
+      $customDuration.value = '';
+    }
+
+    $durationGroup.addEventListener('click', (e) => {
+      const pill = e.target.closest('.duration-pill');
+      if (!pill) return;
+      e.preventDefault();
+
+      const dur = pill.dataset.dur;
+      $durationGroup.querySelectorAll('.duration-pill').forEach(p => p.classList.remove('active'));
+
+      if (dur === 'custom') {
+        pill.classList.add('active');
+        $customDuration.classList.add('show');
+        $customDuration.focus();
+        selectedDuration = parseInt($customDuration.value) || 0;
+      } else {
+        pill.classList.add('active');
+        $customDuration.classList.remove('show');
+        $customDuration.value = '';
+        selectedDuration = parseInt(dur);
+      }
+    });
+
+    $customDuration.addEventListener('input', () => {
+      selectedDuration = parseInt($customDuration.value) || 0;
+    });
+
+    $customDuration.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        addTask();
+      }
+    });
 
     // ── Helpers ──
     function today() {
@@ -437,10 +716,15 @@
       return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
     }
 
-    function formatDate() {
-      const d = new Date();
+    function formatDate(dateStr) {
+      const d = dateStr ? new Date(dateStr + 'T00:00:00') : new Date();
       const weekdays = ['日','一','二','三','四','五','六'];
       return `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日 星期${weekdays[d.getDay()]}`;
+    }
+
+    function formatDateShort(dateStr) {
+      const d = dateStr ? new Date(dateStr + 'T00:00:00') : new Date();
+      return `${d.getMonth()+1}月${d.getDate()}日`;
     }
 
     function now() {
@@ -481,18 +765,88 @@
 
     // ── Persistence ──
     function save() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+      try {
+        // Merge: keep tasks for other dates, replace tasks for current viewDate
+        const raw = localStorage.getItem(STORAGE_KEY);
+        const allTasks = raw ? JSON.parse(raw) : [];
+        const otherTasks = allTasks.filter(t => t.date !== viewDate);
+        const merged = [...otherTasks, ...tasks];
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+      } catch(e) { /* quota exceeded */ }
     }
 
     function load() {
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
-        tasks = raw ? JSON.parse(raw) : [];
-        // Filter out tasks from previous days (keep only today's)
-        const t = today();
-        tasks = tasks.filter(task => task.date === t);
+        const allTasks = raw ? JSON.parse(raw) : [];
+        // Show tasks for the currently viewed date
+        tasks = allTasks.filter(task => task.date === viewDate);
       } catch(e) {
         tasks = [];
+      }
+    }
+
+    // ── Journal Persistence ──
+    function loadJournal() {
+      try {
+        const raw = localStorage.getItem(JOURNAL_KEY);
+        const allJournals = raw ? JSON.parse(raw) : {};
+        return allJournals[viewDate] || '';
+      } catch(e) {
+        return '';
+      }
+    }
+
+    function saveJournal(text) {
+      try {
+        const raw = localStorage.getItem(JOURNAL_KEY);
+        const allJournals = raw ? JSON.parse(raw) : {};
+        allJournals[viewDate] = text;
+        localStorage.setItem(JOURNAL_KEY, JSON.stringify(allJournals));
+        // Flash the "saved" indicator and button
+        $journalSaved.classList.add('visible');
+        $btnSaveJournal.classList.add('saved');
+        $btnSaveJournal.textContent = '✓ 已保存';
+        clearTimeout(journalSaveTimer);
+        journalSaveTimer = setTimeout(() => {
+          $journalSaved.classList.remove('visible');
+          $btnSaveJournal.classList.remove('saved');
+          $btnSaveJournal.textContent = '💾 保存';
+        }, 2000);
+      } catch(e) { /* quota exceeded, ignore */ }
+    }
+
+    // ── Date Navigation ──
+    function switchDate(newDate) {
+      viewDate = newDate;
+      const isToday = viewDate === today();
+
+      // Update date display
+      $dateText.textContent = formatDate(viewDate);
+      $backToday.classList.toggle('show', !isToday);
+
+      // Show/hide add form (only allow adding tasks for today)
+      $addForm.style.display = isToday ? 'block' : 'none';
+
+      // Update journal title
+      $journalTitle.textContent = isToday ? '📓 今日随笔' : `📓 ${formatDateShort(viewDate)} 随笔`;
+
+      // Reload tasks and journal for the selected date
+      load();
+      render();
+      scheduleAllReminders();
+      $journalTextarea.value = loadJournal();
+    }
+
+    function openDatePicker() {
+      $datePicker.value = viewDate;
+      $datePicker.showPicker ? $datePicker.showPicker() : $datePicker.click();
+    }
+
+    function goBackToToday() {
+      if (viewDate !== today()) {
+        switchDate(today());
+        toast('已回到今天');
       }
     }
 
@@ -624,6 +978,10 @@
 
           const timeClass = taskMin < currentMin ? 'overdue' : (taskMin <= currentMin + 30 ? 'soon' : '');
 
+          const extrasHtml = [];
+          if (task.duration) extrasHtml.push(`<span class="task-duration-badge">⏱ ${task.duration}分钟</span>`);
+          if (task.note) extrasHtml.push(`<span class="task-note-text">📝 ${escapeHtml(task.note)}</span>`);
+
           card.innerHTML = `
             <button class="check-btn" data-id="${task.id}" title="标记完成"></button>
             <div class="task-info">
@@ -633,6 +991,7 @@
                 ${taskMin < currentMin ? ' (已超时)' : ''}
                 ${task.snoozedUntil ? ' 🔁已延后' : ''}
               </div>
+              ${extrasHtml.length ? `<div class="task-extras">${extrasHtml.join('')}</div>` : ''}
             </div>
             <button class="btn-delete" data-id="${task.id}" title="删除">✕</button>
           `;
@@ -648,11 +1007,16 @@
         done.forEach(task => {
           const card = document.createElement('div');
           card.className = 'task-card completed';
+          const extrasHtml2 = [];
+          if (task.duration) extrasHtml2.push(`<span class="task-duration-badge">⏱ ${task.duration}分钟</span>`);
+          if (task.note) extrasHtml2.push(`<span class="task-note-text">📝 ${escapeHtml(task.note)}</span>`);
+
           card.innerHTML = `
             <button class="check-btn done" data-id="${task.id}" title="取消完成"></button>
             <div class="task-info">
               <div class="task-name">${escapeHtml(task.name)}</div>
               <div class="task-time">🕐 ${task.time}</div>
+              ${extrasHtml2.length ? `<div class="task-extras">${extrasHtml2.join('')}</div>` : ''}
             </div>
             <button class="btn-delete" data-id="${task.id}" title="删除">✕</button>
           `;
@@ -684,6 +1048,8 @@
     function addTask() {
       const name = $taskInput.value.trim();
       const time = $timeInput.value;
+      const note = $noteInput.value.trim();
+      const duration = selectedDuration; // in minutes, 0 means not set
 
       if (!name) { toast('请输入任务内容'); return; }
       if (!time) { toast('请选择提醒时间'); return; }
@@ -700,6 +1066,8 @@
         time,
         date: today(),
         done: false,
+        note: note || '',
+        duration: duration || 0,
         createdAt: new Date().toISOString(),
         lastReminded: null,
         snoozedUntil: null,
@@ -710,6 +1078,8 @@
       scheduleReminder(task);
       $taskInput.value = '';
       $timeInput.value = '';
+      $noteInput.value = '';
+      resetDurationPills();
       $taskInput.focus();
       render();
       toast('✅ 已添加');
@@ -753,6 +1123,33 @@
         else addTask();
       }
     });
+    $noteInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') addTask();
+    });
+
+    // Journal save button
+    $btnSaveJournal.addEventListener('click', () => {
+      saveJournal($journalTextarea.value);
+    });
+
+    // Journal auto-save as backup (debounced)
+    $journalTextarea.addEventListener('input', () => {
+      clearTimeout(journalSaveTimer);
+      journalSaveTimer = setTimeout(() => saveJournal($journalTextarea.value), 2000);
+    });
+
+    // Date picker
+    $date.addEventListener('click', (e) => {
+      if (e.target.closest('.back-today')) return; // don't open picker when clicking "back"
+      openDatePicker();
+    });
+    $datePicker.addEventListener('change', () => {
+      if ($datePicker.value) switchDate($datePicker.value);
+    });
+    $backToday.addEventListener('click', (e) => {
+      e.stopPropagation();
+      goBackToToday();
+    });
     $btnDismiss.addEventListener('click', () => dismissReminder($overlay.dataset.taskId));
     $btnSnooze.addEventListener('click', () => snoozeReminder($overlay.dataset.taskId));
 
@@ -767,7 +1164,11 @@
 
     // ── Init ──
     function init() {
-      $date.textContent = formatDate();
+      viewDate = today();
+      $dateText.textContent = formatDate();
+      $backToday.classList.remove('show');
+      $addForm.style.display = 'block';
+      $journalTitle.textContent = '📓 今日随笔';
       load();
       // Clean up old snoozed states on fresh load
       tasks.forEach(t => { t.lastReminded = null; t.snoozedUntil = null; });
@@ -775,13 +1176,23 @@
       render();
       scheduleAllReminders();
       requestNotificationPermission();
+      // Load today's journal
+      $journalTextarea.value = loadJournal();
     }
 
     init();
 
-    // Update date display at midnight
+    // Update date display at midnight + handle day change
+    let currentDay = today();
     setInterval(() => {
-      $date.textContent = formatDate();
+      const newDay = today();
+      if (newDay !== currentDay) {
+        currentDay = newDay;
+        // If user was viewing "today" (which is now yesterday), switch to the new today
+        if (viewDate !== newDay && viewDate < newDay) {
+          switchDate(newDay);
+        }
+      }
     }, 60000);
 
     // Also try to request notification on first tap (mobile requires user gesture)

@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#4f46e5">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="每日计划">
+  <title>每日计划</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📋</text></svg>">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary: #4f46e5;
+      --primary-light: #818cf8;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --text-secondary: #64748b;
+      --border: #e2e8f0;
+      --danger: #ef4444;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -2px rgba(0,0,0,0.04);
+      --radius: 16px;
+      --radius-sm: 10px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans SC', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      min-height: 100dvh;
+      padding-bottom: 100px;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
+      color: white;
+      padding: 20px 20px 24px;
+      border-radius: 0 0 24px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      box-shadow: var(--shadow-lg);
+    }
+    .header h1 {
+      font-size: 22px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .header .date {
+      font-size: 14px;
+      opacity: 0.85;
+      margin-top: 4px;
+      font-weight: 400;
+    }
+
+    /* ── Stats Bar ── */
+    .stats {
+      display: flex;
+      gap: 12px;
+      margin: -12px 20px 20px;
+      position: sticky;
+      top: 88px;
+      z-index: 5;
+    }
+    .stat-card {
+      flex: 1;
+      background: var(--card-bg);
+      border-radius: var(--radius-sm);
+      padding: 14px 12px;
+      text-align: center;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+    }
+    .stat-card .number {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    .stat-card .label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    /* ── Add Form ── */
+    .add-form {
+      margin: 0 20px 24px;
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+    }
+    .add-form .row {
+      display: flex;
+      gap: 10px;
+    }
+    .add-form input[type="text"] {
+      flex: 1;
+      padding: 12px 14px;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.2s;
+      background: var(--bg);
+    }
+    .add-form input[type="text"]:focus {
+      border-color: var(--primary);
+    }
+    .add-form input[type="time"] {
+      width: 110px;
+      padding: 12px 10px;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 15px;
+      outline: none;
+      background: var(--bg);
+      text-align: center;
+    }
+    .add-form input[type="time"]:focus {
+      border-color: var(--primary);
+    }
+    .btn-add {
+      padding: 12px 20px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .btn-add:active {
+      transform: scale(0.96);
+      background: #4338ca;
+    }
+
+    /* ── Task List ── */
+    .section {
+      margin: 0 20px 16px;
+    }
+    .section-title {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .task-list { display: flex; flex-direction: column; gap: 10px; }
+
+    .task-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.2s;
+      animation: slideIn 0.3s ease;
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .task-card.completed {
+      opacity: 0.55;
+      background: #f1f5f9;
+    }
+    .task-card.completed .task-name {
+      text-decoration: line-through;
+      color: var(--text-secondary);
+    }
+    .task-card.urgent {
+      border-left: 4px solid var(--danger);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { border-left-color: var(--danger); }
+      50% { border-left-color: #fca5a5; }
+    }
+
+    .check-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 2px solid #cbd5e1;
+      background: white;
+      cursor: pointer;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      font-size: 0;
+    }
+    .check-btn.done {
+      background: var(--success);
+      border-color: var(--success);
+      font-size: 14px;
+    }
+    .check-btn.done::after { content: '✓'; color: white; font-weight: 700; }
+
+    .task-info { flex: 1; min-width: 0; }
+    .task-name {
+      font-size: 15px;
+      font-weight: 500;
+      word-break: break-word;
+    }
+    .task-time {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .task-time.overdue { color: var(--danger); font-weight: 600; }
+    .task-time.soon { color: var(--warning); font-weight: 600; }
+
+    .btn-delete {
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: transparent;
+      color: #94a3b8;
+      font-size: 18px;
+      cursor: pointer;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.15s;
+    }
+    .btn-delete:active { background: #fee2e2; color: var(--danger); }
+
+    /* ── Empty State ── */
+    .empty {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-secondary);
+    }
+    .empty .icon { font-size: 48px; margin-bottom: 12px; }
+    .empty p { font-size: 14px; line-height: 1.6; }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1e293b;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 24px;
+      font-size: 14px;
+      z-index: 100;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      animation: toastIn 0.3s ease, toastOut 0.3s ease 2.5s forwards;
+      pointer-events: none;
+    }
+    @keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(20px); } }
+    @keyframes toastOut { to { opacity: 0; transform: translateX(-50%) translateY(20px); } }
+
+    /* ── Reminder Overlay ── */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.2s;
+    }
+    @keyframes fadeIn { from { opacity: 0; } }
+    .reminder-dialog {
+      background: white;
+      border-radius: 20px;
+      padding: 28px 24px;
+      text-align: center;
+      max-width: 320px;
+      width: 90%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      animation: popIn 0.3s ease;
+    }
+    @keyframes popIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .reminder-dialog .bell { font-size: 56px; margin-bottom: 12px; animation: ring 0.5s ease; }
+    @keyframes ring {
+      0%, 100% { transform: rotate(0); }
+      20% { transform: rotate(15deg); }
+      40% { transform: rotate(-15deg); }
+      60% { transform: rotate(10deg); }
+      80% { transform: rotate(-5deg); }
+    }
+    .reminder-dialog h3 { font-size: 20px; margin-bottom: 6px; }
+    .reminder-dialog .task-desc { font-size: 16px; color: var(--primary); font-weight: 600; margin-bottom: 4px; }
+    .reminder-dialog .task-at { font-size: 14px; color: var(--text-secondary); margin-bottom: 20px; }
+    .btn-dismiss {
+      padding: 12px 40px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 24px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-snooze {
+      padding: 12px 40px;
+      background: transparent;
+      color: var(--text-secondary);
+      border: none;
+      border-radius: 24px;
+      font-size: 14px;
+      cursor: pointer;
+      margin-right: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <h1>📋 每日计划</h1>
+    <div class="date" id="dateDisplay"></div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat-card">
+      <div class="number" id="totalCount">0</div>
+      <div class="label">总任务</div>
+    </div>
+    <div class="stat-card">
+      <div class="number" id="doneCount">0</div>
+      <div class="label">已完成</div>
+    </div>
+    <div class="stat-card">
+      <div class="number" id="remainCount">0</div>
+      <div class="label">待完成</div>
+    </div>
+  </div>
+
+  <!-- Add Form -->
+  <div class="add-form">
+    <div class="row">
+      <input type="text" id="taskInput" placeholder="我想做什么..." maxlength="60" autocomplete="off">
+      <input type="time" id="timeInput">
+      <button class="btn-add" id="btnAdd">＋ 添加</button>
+    </div>
+  </div>
+
+  <!-- Pending Tasks -->
+  <div class="section">
+    <div class="section-title">⏳ 待完成</div>
+    <div class="task-list" id="pendingList"></div>
+    <div class="empty" id="pendingEmpty">
+      <div class="icon">📝</div>
+      <p>还没有任务<br>在上方添加今天的计划吧</p>
+    </div>
+  </div>
+
+  <!-- Completed Tasks -->
+  <div class="section">
+    <div class="section-title">✅ 已完成</div>
+    <div class="task-list" id="doneList"></div>
+  </div>
+
+  <!-- Reminder Overlay (hidden by default) -->
+  <div class="overlay" id="reminderOverlay" style="display:none;">
+    <div class="reminder-dialog">
+      <div class="bell">🔔</div>
+      <h3>时间到！</h3>
+      <div class="task-desc" id="reminderTaskName"></div>
+      <div class="task-at" id="reminderTaskTime"></div>
+      <div style="display:flex;justify-content:center;gap:8px;">
+        <button class="btn-snooze" id="btnSnooze">⏰ 5分钟后提醒</button>
+        <button class="btn-dismiss" id="btnDismiss">知道了</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ── State ──
+    const STORAGE_KEY = 'daily_planner_tasks';
+    let tasks = [];
+    let reminderTimers = {};
+    let snoozedTasks = {}; // track snoozed task IDs with their snooze time
+
+    // ── DOM ──
+    const $date = document.getElementById('dateDisplay');
+    const $taskInput = document.getElementById('taskInput');
+    const $timeInput = document.getElementById('timeInput');
+    const $btnAdd = document.getElementById('btnAdd');
+    const $pendingList = document.getElementById('pendingList');
+    const $doneList = document.getElementById('doneList');
+    const $pendingEmpty = document.getElementById('pendingEmpty');
+    const $total = document.getElementById('totalCount');
+    const $done = document.getElementById('doneCount');
+    const $remain = document.getElementById('remainCount');
+    const $overlay = document.getElementById('reminderOverlay');
+    const $reminderName = document.getElementById('reminderTaskName');
+    const $reminderTime = document.getElementById('reminderTaskTime');
+    const $btnDismiss = document.getElementById('btnDismiss');
+    const $btnSnooze = document.getElementById('btnSnooze');
+
+    // ── Helpers ──
+    function today() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    }
+
+    function formatDate() {
+      const d = new Date();
+      const weekdays = ['日','一','二','三','四','五','六'];
+      return `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日 星期${weekdays[d.getDay()]}`;
+    }
+
+    function now() {
+      const d = new Date();
+      return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+    }
+
+    function timeToMinutes(t) {
+      const [h, m] = t.split(':').map(Number);
+      return h * 60 + m;
+    }
+
+    function toast(msg) {
+      const el = document.createElement('div');
+      el.className = 'toast';
+      el.textContent = msg;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 3000);
+    }
+
+    function playBeep() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'sine';
+        gain.gain.value = 0.3;
+        // Play a pleasant 3-note chime
+        [523.25, 659.25, 783.99].forEach((freq, i) => {
+          osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.15);
+        });
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.5);
+      } catch(e) { /* audio not supported */ }
+    }
+
+    // ── Persistence ──
+    function save() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+    }
+
+    function load() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        tasks = raw ? JSON.parse(raw) : [];
+        // Filter out tasks from previous days (keep only today's)
+        const t = today();
+        tasks = tasks.filter(task => task.date === t);
+      } catch(e) {
+        tasks = [];
+      }
+    }
+
+    // ── Notifications ──
+    function requestNotificationPermission() {
+      if ('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission();
+      }
+    }
+
+    function showNotification(task) {
+      // Browser notification
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification('⏰ 提醒：' + task.name, {
+          body: '现在是 ' + task.time + '，该去做这件事了！',
+          icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">📋</text></svg>',
+          tag: 'task-reminder-' + task.id,
+          vibrate: [200, 100, 200, 100, 200],
+        });
+      }
+      // In-app reminder dialog
+      $reminderName.textContent = task.name;
+      $reminderTime.textContent = '⏰ ' + task.time;
+      $overlay.style.display = 'flex';
+      $overlay.dataset.taskId = task.id;
+      playBeep();
+    }
+
+    function dismissReminder(taskId) {
+      $overlay.style.display = 'none';
+      if (taskId) {
+        // Mark task as "reminded" so we don't remind again this minute
+        const task = tasks.find(t => t.id === taskId);
+        if (task) {
+          task.lastReminded = now();
+          task.snoozedUntil = null;
+          save();
+        }
+      }
+    }
+
+    function snoozeReminder(taskId) {
+      $overlay.style.display = 'none';
+      if (taskId) {
+        const task = tasks.find(t => t.id === taskId);
+        if (task) {
+          // Snooze for 5 minutes
+          const [h, m] = now().split(':').map(Number);
+          const totalMin = h * 60 + m + 5;
+          const nh = Math.floor(totalMin / 60) % 24;
+          const nm = totalMin % 60;
+          task.snoozedUntil = `${String(nh).padStart(2,'0')}:${String(nm).padStart(2,'0')}`;
+          task.lastReminded = null;
+          save();
+          scheduleReminder(task);
+          toast('已在 5 分钟后重新提醒');
+        }
+      }
+    }
+
+    // ── Reminder Scheduling ──
+    function scheduleReminder(task) {
+      const key = task.id;
+      // Clear existing timer
+      if (reminderTimers[key]) {
+        clearInterval(reminderTimers[key]);
+        delete reminderTimers[key];
+      }
+
+      if (task.done) return;
+
+      const targetTime = task.snoozedUntil || task.time;
+      const targetMin = timeToMinutes(targetTime);
+
+      // Check every 15 seconds if we've hit the time
+      reminderTimers[key] = setInterval(() => {
+        const currentMin = timeToMinutes(now());
+        const currentExact = now();
+
+        if (currentMin >= targetMin && task.lastReminded !== currentExact && !task.done) {
+          // Only remind if not snoozed away
+          const taskStillExists = tasks.find(t => t.id === task.id);
+          if (taskStillExists && !taskStillExists.done) {
+            showNotification(taskStillExists);
+            taskStillExists.lastReminded = currentExact;
+            if (taskStillExists.snoozedUntil) {
+              taskStillExists.snoozedUntil = null;
+            }
+            save();
+          }
+          // If we reminded and it's not snoozed, clear timer (wait for snooze to re-schedule)
+          const refreshed = tasks.find(t => t.id === task.id);
+          if (refreshed && !refreshed.snoozedUntil && !refreshed.done) {
+            // Keep checking in case user doesn't dismiss (remind every 2 min)
+            refreshed.lastReminded = currentExact;
+            save();
+          }
+        }
+      }, 15000);
+    }
+
+    function scheduleAllReminders() {
+      tasks.forEach(task => {
+        if (!task.done) scheduleReminder(task);
+      });
+    }
+
+    // ── Render ──
+    function render() {
+      const pending = tasks.filter(t => !t.done).sort((a, b) => timeToMinutes(a.time) - timeToMinutes(b.time));
+      const done = tasks.filter(t => t.done).sort((a, b) => timeToMinutes(b.time) - timeToMinutes(a.time));
+      const currentMin = timeToMinutes(now());
+
+      // Pending list
+      $pendingList.innerHTML = '';
+      if (pending.length === 0) {
+        $pendingEmpty.style.display = 'block';
+        $pendingList.style.display = 'none';
+      } else {
+        $pendingEmpty.style.display = 'none';
+        $pendingList.style.display = 'flex';
+        pending.forEach(task => {
+          const card = document.createElement('div');
+          card.className = 'task-card';
+          const taskMin = timeToMinutes(task.time);
+          if (taskMin <= currentMin && taskMin >= currentMin - 1) {
+            card.classList.add('urgent');
+          }
+
+          const timeClass = taskMin < currentMin ? 'overdue' : (taskMin <= currentMin + 30 ? 'soon' : '');
+
+          card.innerHTML = `
+            <button class="check-btn" data-id="${task.id}" title="标记完成"></button>
+            <div class="task-info">
+              <div class="task-name">${escapeHtml(task.name)}</div>
+              <div class="task-time ${timeClass}">
+                🕐 ${task.time}
+                ${taskMin < currentMin ? ' (已超时)' : ''}
+                ${task.snoozedUntil ? ' 🔁已延后' : ''}
+              </div>
+            </div>
+            <button class="btn-delete" data-id="${task.id}" title="删除">✕</button>
+          `;
+          $pendingList.appendChild(card);
+        });
+      }
+
+      // Done list
+      $doneList.innerHTML = '';
+      if (done.length === 0) {
+        $doneList.innerHTML = '<div class="empty"><p style="font-size:13px;">完成一些任务吧 💪</p></div>';
+      } else {
+        done.forEach(task => {
+          const card = document.createElement('div');
+          card.className = 'task-card completed';
+          card.innerHTML = `
+            <button class="check-btn done" data-id="${task.id}" title="取消完成"></button>
+            <div class="task-info">
+              <div class="task-name">${escapeHtml(task.name)}</div>
+              <div class="task-time">🕐 ${task.time}</div>
+            </div>
+            <button class="btn-delete" data-id="${task.id}" title="删除">✕</button>
+          `;
+          $doneList.appendChild(card);
+        });
+      }
+
+      // Stats
+      $total.textContent = tasks.length;
+      $done.textContent = done.length;
+      $remain.textContent = pending.length;
+
+      // Bind events
+      document.querySelectorAll('.check-btn').forEach(btn => {
+        btn.addEventListener('click', () => toggleTask(btn.dataset.id));
+      });
+      document.querySelectorAll('.btn-delete').forEach(btn => {
+        btn.addEventListener('click', () => deleteTask(btn.dataset.id));
+      });
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // ── Actions ──
+    function addTask() {
+      const name = $taskInput.value.trim();
+      const time = $timeInput.value;
+
+      if (!name) { toast('请输入任务内容'); return; }
+      if (!time) { toast('请选择提醒时间'); return; }
+
+      // Check duplicate
+      if (tasks.some(t => t.name === name && t.time === time && !t.done)) {
+        toast('已存在相同的任务');
+        return;
+      }
+
+      const task = {
+        id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+        name,
+        time,
+        date: today(),
+        done: false,
+        createdAt: new Date().toISOString(),
+        lastReminded: null,
+        snoozedUntil: null,
+      };
+
+      tasks.push(task);
+      save();
+      scheduleReminder(task);
+      $taskInput.value = '';
+      $timeInput.value = '';
+      $taskInput.focus();
+      render();
+      toast('✅ 已添加');
+    }
+
+    function toggleTask(id) {
+      const task = tasks.find(t => t.id === id);
+      if (!task) return;
+      task.done = !task.done;
+      if (task.done) {
+        // Clear reminder
+        if (reminderTimers[id]) {
+          clearInterval(reminderTimers[id]);
+          delete reminderTimers[id];
+        }
+        toast('🎉 已完成！');
+      } else {
+        scheduleReminder(task);
+        toast('已恢复任务');
+      }
+      save();
+      render();
+    }
+
+    function deleteTask(id) {
+      if (reminderTimers[id]) {
+        clearInterval(reminderTimers[id]);
+        delete reminderTimers[id];
+      }
+      tasks = tasks.filter(t => t.id !== id);
+      save();
+      render();
+      toast('已删除');
+    }
+
+    // ── Events ──
+    $btnAdd.addEventListener('click', addTask);
+    $taskInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        if (!$timeInput.value) $timeInput.focus();
+        else addTask();
+      }
+    });
+    $btnDismiss.addEventListener('click', () => dismissReminder($overlay.dataset.taskId));
+    $btnSnooze.addEventListener('click', () => snoozeReminder($overlay.dataset.taskId));
+
+    // Close overlay on backdrop click
+    $overlay.addEventListener('click', (e) => {
+      if (e.target === $overlay) dismissReminder($overlay.dataset.taskId);
+    });
+
+    // Set default time to next hour
+    const nextHour = (new Date().getHours() + 1) % 24;
+    $timeInput.value = `${String(nextHour).padStart(2,'0')}:00`;
+
+    // ── Init ──
+    function init() {
+      $date.textContent = formatDate();
+      load();
+      // Clean up old snoozed states on fresh load
+      tasks.forEach(t => { t.lastReminded = null; t.snoozedUntil = null; });
+      save();
+      render();
+      scheduleAllReminders();
+      requestNotificationPermission();
+    }
+
+    init();
+
+    // Update date display at midnight
+    setInterval(() => {
+      $date.textContent = formatDate();
+    }, 60000);
+
+    // Also try to request notification on first tap (mobile requires user gesture)
+    document.addEventListener('click', requestNotificationPermission, { once: true });
+
+    console.log('📋 每日计划 App 已就绪');
+
+    // Register Service Worker for offline/PWA
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
+    }
+  </script>
+</body>
+</html>
